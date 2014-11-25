@@ -30,6 +30,9 @@ func (h HTMLFetcher) Generate(query neturl.Values) (content []byte, err error) {
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
 		err = StatusCodeError{url, resp.StatusCode}
+		// try to read all error message in the body and return to high
+		// level application
+		content, _ = ioutil.ReadAll(resp.Body)
 		return
 	}
 

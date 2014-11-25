@@ -30,6 +30,7 @@ func (g fetcherGetter) Get(_ groupcache.Context, key string, dest groupcache.Sin
 	}
 	bytes, err := g.Generate(q)
 	if err != nil {
+		dest.SetBytes(bytes)
 		return err
 	}
 	return dest.SetBytes(bytes)
@@ -67,7 +68,7 @@ func (g *GGFetchHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var buf []byte
 	if err := hi.Group.Get(nil, key, groupcache.AllocatingByteSliceSink(&buf)); err != nil {
 		log.Println("ERROR", err, "METHOD", method, "KEY", key)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, string(buf), http.StatusInternalServerError)
 		return
 	}
 	if err := hi.Fetcher.WriteResponse(w, buf); err != nil {
